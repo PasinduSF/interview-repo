@@ -5,9 +5,9 @@
   functions = "netlify/functions"
 
 [functions]
-  # Bundle files that are read from disk at runtime (JSON seed data and the
-  # Swagger UI static assets) so they exist inside the deployed function.
-  included_files = ["data/**", "node_modules/swagger-ui-dist/**"]
+  # Swagger UI serves static assets from disk at runtime; bundle them so the
+  # /api-docs page renders. (Seed data is now inlined in src/db.js — no files.)
+  included_files = ["node_modules/swagger-ui-dist/**"]
 
 # Send every request to the Express app. force = true so it wins even if a file
 # with the same path exists in the publish dir (nothing sensitive is exposed).
