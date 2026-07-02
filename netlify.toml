@@ -1,0 +1,18 @@
+[build]
+  command = "npm install"
+  # 'public' holds no assets — every request is rewritten to the function below.
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  # Bundle files that are read from disk at runtime (JSON seed data and the
+  # Swagger UI static assets) so they exist inside the deployed function.
+  included_files = ["data/**", "node_modules/swagger-ui-dist/**"]
+
+# Send every request to the Express app. force = true so it wins even if a file
+# with the same path exists in the publish dir (nothing sensitive is exposed).
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+  force = true
