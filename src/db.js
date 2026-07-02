@@ -1,39 +1,19 @@
-const fs = require("fs");
-const path = require("path");
-const bcrypt = require("bcryptjs");
+// Seed data is loaded via require() (not fs.readFileSync) so Vercel bundles the
+// JSON into the serverless function. Vercel's filesystem is read-only at runtime,
+// so we never write to disk: courses are held in memory. Updates therefore persist
+// for the life of a warm function instance and reset on a cold start — which is
+// fine for this QA practice API. Locally with `node server.js` it behaves the same
+// (in-memory), just without touching the JSON files.
+const seedUsers = require("../data/users.json");
+const seedCourses = require("../data/courses.json");
 
-const DATA_DIR = path.join(__dirname, "..", "data");
-const USERS_FILE = path.join(DATA_DIR, "users.json");
-const COURSES_FILE = path.join(DATA_DIR, "courses.json");
-
-function readJson(file) {
-  return JSON.parse(fs.readFileSync(file, "utf8"));
-}
-
-function writeJson(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
-}
-
-// Seed the users file on first run with bcrypt-hashed passwords so we never
-// store plaintext credentials on disk.
-function seedUsers() {
-  if (fs.existsSync(USERS_FILE)) return;
-  const defaults = [
-    { id: 1, username: "admin", password: "admin123", role: "admin" },
-  ];
-  const users = defaults.map((u) => ({
-    id: u.id,
-    username: u.username,
-    passwordHash: bcrypt.hashSync(u.password, 10),
-    role: u.role,
-  }));
-  writeJson(USERS_FILE, users);
-}
-
-seedUsers();
+// Clone so the in-memory copy can be mutated without altering the required module.
+let courses = JSON.parse(JSON.stringify(seedCourses));
 
 module.exports = {
-  getUsers: () => readJson(USERS_FILE),
-  getCourses: () => readJson(COURSES_FILE),
-  saveCourses: (courses) => writeJson(COURSES_FILE, courses),
+  getUsers: () => seedUsers,
+  getCourses: () => courses,
+  saveCourses: (next) => {
+    courses = next;
+  },
 };

@@ -31,7 +31,9 @@ const swaggerSpec = {
       "response, then on the protected endpoints paste `Bearer <token>` into the " +
       "**Authorization** field before clicking Execute.",
   },
-  servers: [{ url: "http://localhost:3000", description: "Local server" }],
+  // Relative URL so "Try it out" targets whatever host serves the docs
+  // (localhost when run locally, the Vercel domain when deployed).
+  servers: [{ url: "/", description: "Current host" }],
   tags: [
     { name: "Auth", description: "Login" },
     { name: "Courses", description: "Course list & update" },

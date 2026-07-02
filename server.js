@@ -43,9 +43,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Trainee QA CRUD API running at http://localhost:${PORT}`);
-  console.log(`Swagger docs available at   http://localhost:${PORT}/api-docs`);
-});
+// Only start a listening server when run directly (e.g. `node server.js` or
+// `npm start`). On Vercel the app is imported as a serverless handler, so we must
+// NOT call app.listen there — we just export the Express app instead.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Trainee QA CRUD API running at http://localhost:${PORT}`);
+    console.log(`Swagger docs available at   http://localhost:${PORT}/api-docs`);
+  });
+}
 
 module.exports = app;
